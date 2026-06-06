@@ -45,6 +45,10 @@ async function apiDelete(path) {
 }
 
 // --- AUTH LOGIC ---
+function getDisplayName(username) {
+    return username === "admin" ? "Mantix" : username;
+}
+
 function checkAuthState() {
     const loginOverlay = document.getElementById('login-overlay');
     const appLayout = document.getElementById('app-main-layout');
@@ -65,12 +69,38 @@ function checkAuthState() {
         updateActivity();
         if (loginOverlay) loginOverlay.style.display = 'none';
         if (appLayout) appLayout.style.display = 'block';
-        if (userDisplay) userDisplay.textContent = `Uživatel: ${currentUsername}`;
+        userDisplay.textContent = `Uživatel: ${getDisplayName(currentUsername)}`;
         initApp();
     } else {
         if (loginOverlay) loginOverlay.style.display = 'flex';
         if (appLayout) appLayout.style.display = 'none';
     }
+}
+
+// --- MODAL LOGIC ---
+function showModal(title, message, onConfirm) {
+    const modal = document.getElementById('custom-modal');
+    const titleEl = document.getElementById('modal-title');
+    const messageEl = document.getElementById('modal-message');
+    const confirmBtn = document.getElementById('modal-confirm');
+    const cancelBtn = document.getElementById('modal-cancel');
+
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    modal.style.display = 'flex';
+
+    const close = () => {
+        modal.style.display = 'none';
+        confirmBtn.onclick = null;
+        cancelBtn.onclick = null;
+    };
+
+    confirmBtn.onclick = () => {
+        onConfirm();
+        close();
+    };
+
+    cancelBtn.onclick = close;
 }
 
 function updateActivity() {
@@ -249,10 +279,11 @@ function renderDay(dayNumber, classes) {
     div.innerHTML = `<span class="day-number">${dayNumber}</span>`;
     
     if (isMainMonth && commitments[dateStr]) {
+        const username = commitments[dateStr];
         const userDiv = document.createElement('div');
-        userDiv.className = 'day-user';
-        userDiv.textContent = commitments[dateStr];
-        userDiv.title = commitments[dateStr];
+        userDiv.className = `day-user ${username === 'admin' ? 'is-admin' : ''}`;
+        userDiv.textContent = getDisplayName(username);
+        userDiv.title = getDisplayName(username);
         div.appendChild(userDiv);
     }
 
@@ -272,7 +303,7 @@ function formatDate(year, month, day) {
 async function toggleCommitment(dateStr) {
     if (commitments[dateStr]) {
         if (commitments[dateStr] === currentUsername) {
-            if (confirm(`Chcete zrušit svůj závazek na ${dateStr}?`)) {
+            showModal("Zrušení závazku", `Chcete zrušit svůj závazek na ${dateStr}?`, async () => {
                 try {
                     await apiDelete(`commitments/${dateStr}`);
                     delete commitments[dateStr];
@@ -280,12 +311,22 @@ async function toggleCommitment(dateStr) {
                 } catch (err) {
                     alert("Chyba při rušení závazku");
                 }
-            }
+            });
         } else {
-            alert(`Tento den už si zabral(a) ${commitments[dateStr]}`);
+            showModal("Obsazeno", `Tento den už si zabral(a) ${getDisplayName(commitments[dateStr])}.`, () => {});
+            // Skryjeme tlačítko zrušit pro info modaly
+            const cancelBtn = document.getElementById('modal-cancel');
+            cancelBtn.style.display = 'none';
+            // Obnovíme ho při zavření (řešeno v showModal resetu příště, nebo tady jednoduše)
+            const confirmBtn = document.getElementById('modal-confirm');
+            const originalConfirmClick = confirmBtn.onclick;
+            confirmBtn.onclick = () => {
+                if (originalConfirmClick) originalConfirmClick();
+                cancelBtn.style.display = 'block';
+            };
         }
     } else {
-        if (confirm(`Chcete se přihlásit k placení daní na ${dateStr}?`)) {
+        showModal("Nový závazek", `Chcete se přihlásit k placení daní na ${dateStr}?`, async () => {
             try {
                 await apiPut(`commitments/${dateStr}`, currentUsername);
                 commitments[dateStr] = currentUsername;
@@ -293,7 +334,7 @@ async function toggleCommitment(dateStr) {
             } catch (err) {
                 alert("Chyba při ukládání závazku");
             }
-        }
+        });
     }
 }
 
