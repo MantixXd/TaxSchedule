@@ -1,0 +1,289 @@
+:root {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --primary-color: #007bff;
+    --primary-hover: #0056b3;
+    --text-color: #e0e0e0;
+    --text-muted: #a0a0a0;
+    --error-color: #ff5252;
+    --success-color: #4caf50;
+    --border-color: #333;
+    --today-bg: #303f9f;
+    --selected-bg: #444;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* Login Overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.login-box {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-box h1 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    background: #2a2a2a;
+    color: white;
+}
+
+.login-box button {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--primary-color);
+    border: none;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.login-box button:hover {
+    background: var(--primary-hover);
+}
+
+.error-text {
+    color: var(--error-color);
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+/* Main Layout */
+header {
+    background: var(--card-bg);
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#logout-button {
+    padding: 0.4rem 0.8rem;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#logout-button:hover {
+    background: #333;
+}
+
+main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    display: grid;
+    gap: 2rem;
+}
+
+.card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.card h2 {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    color: var(--primary-color);
+}
+
+/* Config Section */
+.params-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.param-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.param-group label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.param-group input {
+    padding: 0.6rem;
+    background: #2a2a2a;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: white;
+}
+
+.calc-result {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #252525;
+    border-radius: 4px;
+    border-left: 4px solid var(--primary-color);
+}
+
+#save-params {
+    padding: 0.8rem 1.5rem;
+    background: var(--success-color);
+    border: none;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#save-params:hover {
+    opacity: 0.9;
+}
+
+/* Calendar Section */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.calendar-nav button {
+    padding: 0.4rem 0.8rem;
+    background: #333;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.calendar-day {
+    min-height: 100px;
+    background: #252525;
+    padding: 5px;
+    border: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.calendar-day:hover {
+    background: #2a2a2a;
+}
+
+.calendar-day.header-day {
+    min-height: auto;
+    background: transparent;
+    border: none;
+    text-align: center;
+    font-weight: bold;
+    color: var(--text-muted);
+    cursor: default;
+}
+
+.calendar-day.other-month {
+    opacity: 0.3;
+}
+
+.calendar-day.today {
+    border-color: var(--primary-color);
+}
+
+.day-number {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.day-user {
+    background: var(--primary-color);
+    color: white;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .calendar-grid {
+        grid-template-columns: repeat(7, 1fr);
+    }
+    
+    .calendar-day {
+        min-height: 60px;
+        font-size: 0.8rem;
+    }
+    
+    .day-user {
+        font-size: 0.6rem;
+    }
+}
