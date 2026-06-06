@@ -78,7 +78,7 @@ function checkAuthState() {
 }
 
 // --- MODAL LOGIC ---
-function showModal(title, message, onConfirm) {
+function showModal(title, message, onConfirm, isInfo = false) {
     const modal = document.getElementById('custom-modal');
     const titleEl = document.getElementById('modal-title');
     const messageEl = document.getElementById('modal-message');
@@ -88,6 +88,8 @@ function showModal(title, message, onConfirm) {
     titleEl.textContent = title;
     messageEl.textContent = message;
     modal.style.display = 'flex';
+    
+    cancelBtn.style.display = isInfo ? 'none' : 'block';
 
     const close = () => {
         modal.style.display = 'none';
@@ -96,7 +98,7 @@ function showModal(title, message, onConfirm) {
     };
 
     confirmBtn.onclick = () => {
-        onConfirm();
+        if (onConfirm) onConfirm();
         close();
     };
 
@@ -208,10 +210,10 @@ async function saveParameters() {
         parameters = newParams;
         updateCalculation();
     } catch (err) {
-        alert("Chyba při ukládání parametrů");
+        showModal("Chyba", "Chyba při ukládání parametrů", null, true);
     } finally {
         saveBtn.disabled = false;
-        saveBtn.textContent = "Uložit parametry";
+        saveBtn.textContent = "Uložit";
     }
 }
 
@@ -239,29 +241,33 @@ function renderCalendar() {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     
-    // Adjust for Monday start (JS 0 is Sunday)
     let startDay = firstDay.getDay() - 1;
     if (startDay === -1) startDay = 6;
 
     // Days from previous month
     const prevMonthLastDay = new Date(year, month, 0).getDate();
     for (let i = startDay - 1; i >= 0; i--) {
-        const day = prevMonthLastDay - i;
-        renderDay(day, 'other-month');
+        renderDay(prevMonthLastDay - i, 'other-month');
     }
 
     // Current month days
-    const today = new Date();
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
     for (let i = 1; i <= lastDay.getDate(); i++) {
         let classes = '';
-        if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+        const currentIterDate = new Date(year, month, i);
+        
+        if (currentIterDate.getTime() === today.getTime()) {
             classes = 'today';
+        } else if (currentIterDate < today) {
+            classes = 'past-day';
         }
         renderDay(i, classes);
     }
 
     // Days from next month
-    const totalSlots = 42; // 6 rows
+    const totalSlots = 42;
     const currentSlots = startDay + lastDay.getDate();
     for (let i = 1; i <= (totalSlots - currentSlots); i++) {
         renderDay(i, 'other-month');
@@ -287,7 +293,7 @@ function renderDay(dayNumber, classes) {
         div.appendChild(userDiv);
     }
 
-    if (isMainMonth) {
+    if (isMainMonth && !classes.includes('past-day')) {
         div.onclick = () => toggleCommitment(dateStr);
     }
 
@@ -300,39 +306,40 @@ function formatDate(year, month, day) {
     return `${year}-${m}-${d}`;
 }
 
+function formatCzechDate(dateStr) {
+    const [year, month, day] = dateStr.split('-');
+    const monthNames = [
+        "ledna", "února", "března", "dubna", "května", "června",
+        "července", "srpna", "září", "října", "listopadu", "prosince"
+    ];
+    return `${parseInt(day)}. ${monthNames[parseInt(month) - 1]} ${year}`;
+}
+
 async function toggleCommitment(dateStr) {
+    const readableDate = formatCzechDate(dateStr);
+    
     if (commitments[dateStr]) {
         if (commitments[dateStr] === currentUsername) {
-            showModal("Zrušení závazku", `Chcete zrušit svůj závazek na ${dateStr}?`, async () => {
+            showModal("Zrušení závazku", `Chcete zrušit svůj závazek na ${readableDate}?`, async () => {
                 try {
                     await apiDelete(`commitments/${dateStr}`);
                     delete commitments[dateStr];
                     renderCalendar();
                 } catch (err) {
-                    alert("Chyba při rušení závazku");
+                    showModal("Chyba", "Chyba při rušení závazku", null, true);
                 }
             });
         } else {
-            showModal("Obsazeno", `Tento den už si zabral(a) ${getDisplayName(commitments[dateStr])}.`, () => {});
-            // Skryjeme tlačítko zrušit pro info modaly
-            const cancelBtn = document.getElementById('modal-cancel');
-            cancelBtn.style.display = 'none';
-            // Obnovíme ho při zavření (řešeno v showModal resetu příště, nebo tady jednoduše)
-            const confirmBtn = document.getElementById('modal-confirm');
-            const originalConfirmClick = confirmBtn.onclick;
-            confirmBtn.onclick = () => {
-                if (originalConfirmClick) originalConfirmClick();
-                cancelBtn.style.display = 'block';
-            };
+            showModal("Obsazeno", `Tento den už si zabral(a) ${getDisplayName(commitments[dateStr])}.`, null, true);
         }
     } else {
-        showModal("Nový závazek", `Chcete se přihlásit k placení daní na ${dateStr}?`, async () => {
+        showModal("Nový závazek", `Chcete se přihlásit k placení daní na ${readableDate}?`, async () => {
             try {
                 await apiPut(`commitments/${dateStr}`, currentUsername);
                 commitments[dateStr] = currentUsername;
                 renderCalendar();
             } catch (err) {
-                alert("Chyba při ukládání závazku");
+                showModal("Chyba", "Chyba při ukládání závazku", null, true);
             }
         });
     }
@@ -356,7 +363,6 @@ function setupEventListeners() {
         renderCalendar();
     };
 
-    // Auto-update activity on mouse/key
     document.addEventListener('mousemove', updateActivity);
     document.addEventListener('keypress', updateActivity);
 }
