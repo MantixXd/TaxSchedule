@@ -87,17 +87,30 @@ body {
 
 /* Main Layout */
 header {
-    background: var(--card-bg);
-    padding: 1rem 2rem;
-    border-bottom: 1px solid var(--border-color);
+    background: #1a1a1a;
+    padding: 0.75rem 2rem;
+    border-bottom: 2px solid var(--primary-color);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
-.header-content {
+.header-content h1 {
+    font-size: 1.4rem;
+    letter-spacing: -0.5px;
+    background: linear-gradient(to right, #fff, var(--text-muted));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.user-info {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    max-width: 1400px;
-    margin: 0 auto;
+    gap: 1.5rem;
+}
+
+#user-display {
+    font-weight: 500;
+    color: var(--text-muted);
+    font-size: 0.95rem;
 }
 
 #logout-button {
@@ -132,46 +145,42 @@ header {
     flex-grow: 1;
 }
 
-.card {
-    background: var(--card-bg);
-    padding: 1.2rem;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.card h2 {
-    margin-bottom: 1.2rem;
-    font-size: 1.2rem;
-    color: var(--primary-color);
-}
 
 /* Params Sidebar */
-.params-vertical {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.param-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-}
-
-.param-group label {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
 .param-group input {
-    padding: 0.6rem;
-    background: #2a2a2a;
+    padding: 0.75rem;
+    background: #252525;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 8px;
     color: white;
     width: 100%;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.param-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+/* Style for number input arrows (Chrome, Safari, Edge, Opera) */
+.param-group input::-webkit-outer-spin-button,
+.param-group input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+    background: var(--primary-color);
+    cursor: pointer;
+}
+
+/* Firefox */
+.param-group input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Custom spin buttons for better UX */
+.param-group {
+    position: relative;
 }
 
 .calc-result {
