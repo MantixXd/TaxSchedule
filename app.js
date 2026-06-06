@@ -51,6 +51,23 @@ function getDisplayName(username) {
     return name.charAt(0).toUpperCase() + name.slice(1);
 }
 
+const USER_COLORS = [
+    "#2ecc71", "#3498db", "#9b59b6", "#f1c40f", "#e74c3c", 
+    "#1abc9c", "#d35400", "#c0392b", "#8e44ad", "#27ae60",
+    "#2980b9", "#16a085", "#2c3e50"
+];
+
+function getUserColor(username) {
+    if (username === "admin") return "#f39c12"; // Mantix orange
+    
+    let hash = 0;
+    for (let i = 0; i < username.length; i++) {
+        hash = username.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % USER_COLORS.length;
+    return USER_COLORS[index];
+}
+
 function checkAuthState() {
     const loginOverlay = document.getElementById('login-overlay');
     const appLayout = document.getElementById('app-main-layout');
@@ -292,6 +309,10 @@ function renderDay(dayNumber, classes) {
         userDiv.className = `day-user ${username === 'admin' ? 'is-admin' : ''}`;
         userDiv.textContent = getDisplayName(username);
         userDiv.title = getDisplayName(username);
+        
+        // Apply unique user color
+        userDiv.style.background = getUserColor(username);
+        
         div.appendChild(userDiv);
     }
 
