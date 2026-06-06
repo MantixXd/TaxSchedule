@@ -291,6 +291,12 @@ header {
     margin-bottom: 1rem;
 }
 
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
 .nav-btn {
     padding: 0.5rem 1rem;
     background: var(--primary-color);
