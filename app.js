@@ -46,7 +46,9 @@ async function apiDelete(path) {
 
 // --- AUTH LOGIC ---
 function getDisplayName(username) {
-    return username === "admin" ? "Mantix" : username;
+    if (!username) return "";
+    let name = username === "admin" ? "Mantix" : username;
+    return name.charAt(0).toUpperCase() + name.slice(1);
 }
 
 function checkAuthState() {
