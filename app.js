@@ -142,7 +142,7 @@ function setupLogin() {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitBtn = loginForm.querySelector('button');
-        const loginUsername = document.getElementById('login-username').value;
+        const loginUsername = document.getElementById('login-username').value.trim().toLowerCase();
         const loginPass = document.getElementById('login-password').value;
         const loginError = document.getElementById('login-error');
 
