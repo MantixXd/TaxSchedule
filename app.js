@@ -22,7 +22,8 @@ function getWeekKey(date) {
     d.setDate(d.getDate() + 4 - (d.getDay() || 7));
     const yearStart = new Date(d.getFullYear(), 0, 1);
     const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-    return `${d.getFullYear()}-W${weekNo}`;
+    const paddedWeek = weekNo.toString().padStart(2, '0');
+    return `${d.getFullYear()}-W${paddedWeek}`;
 }
 
 function getWeekRange(date) {
@@ -293,18 +294,25 @@ function renderPayments() {
     }
 
     const weekData = payments[weekKey] || {};
-    const weekStatus = weekData.status || weekData || {}; // Handle old data format too
+    const weekStatus = weekData.status || weekData || {}; 
 
     // Determine which member list to use
-    let displayList = [];
+    let baseList = [];
     if (weekData.membersSnapshot) {
-        displayList = Array.isArray(weekData.membersSnapshot) ? weekData.membersSnapshot : Object.values(weekData.membersSnapshot);
+        baseList = Array.isArray(weekData.membersSnapshot) ? weekData.membersSnapshot : Object.values(weekData.membersSnapshot);
     } else {
-        displayList = [...membersList];
+        baseList = [...membersList];
     }
 
+    // ENSURE HISTORICAL VISIBILITY:
+    // Even if not in snapshot/roster, show anyone who has a recorded payment in this week
+    const statusKeys = (weekData.status) ? Object.keys(weekData.status) : Object.keys(weekData).filter(k => k !== 'membersSnapshot' && k !== 'status');
+    const displayList = Array.from(new Set([...baseList, ...statusKeys]));
+
     displayList.sort().forEach(member => {
-        // Find payment info
+        // Skip snapshot or status internal fields if they leaked into keys
+        if (member === 'membersSnapshot' || member === 'status') return;
+
         const paidBy = weekStatus[member];
         const isPaid = !!paidBy;
 
