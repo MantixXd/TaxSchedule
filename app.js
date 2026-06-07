@@ -4,6 +4,7 @@ const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 // --- STATE ---
 let currentUsername = "";
 let currentMonth = new Date();
+let currentWeekDate = new Date();
 let parameters = {
     members: 0,
     claims: 0,
@@ -34,6 +35,11 @@ function getWeekRange(date) {
     
     const format = (dt) => `${dt.getDate()}.${dt.getMonth() + 1}.`;
     return `${format(monday)} - ${format(sunday)}`;
+}
+
+function changeWeek(delta) {
+    currentWeekDate.setDate(currentWeekDate.getDate() + (delta * 7));
+    renderPayments();
 }
 
 // --- API HELPERS ---
@@ -244,8 +250,8 @@ async function loadData() {
 function renderPayments() {
     const listEl = document.getElementById('members-payment-list');
     const adminActions = document.getElementById('admin-member-actions');
-    const weekKey = getWeekKey(new Date()); // Always show current real week
-    const weekRange = getWeekRange(new Date());
+    const weekKey = getWeekKey(currentWeekDate);
+    const weekRange = getWeekRange(currentWeekDate);
     
     document.getElementById('current-week-display').textContent = weekRange;
     
@@ -284,7 +290,7 @@ function renderPayments() {
 }
 
 async function togglePayment(member, status) {
-    const weekKey = getWeekKey(new Date());
+    const weekKey = getWeekKey(currentWeekDate);
     try {
         if (status) {
             await apiPut(`payments/${weekKey}/${member}`, true);
@@ -311,6 +317,8 @@ async function addMember() {
     }
 
     try {
+        // Find existing members list object if it's not an array
+        // apiPost pushes to the list
         await apiPost('members', name);
         membersList.push(name);
         input.value = '';
@@ -322,7 +330,6 @@ async function addMember() {
 
 async function removeMember(name) {
     // Pro zjednodušení teď jen přes konzoli nebo modal, pokud by bylo potřeba
-    // Ale v UI to teď nebudeme komplikovat, admin může jméno přidat
 }
 
 function updateCalculation() {
@@ -522,6 +529,9 @@ function setupEventListeners() {
         currentMonth.setMonth(currentMonth.getMonth() + 1);
         renderCalendar();
     };
+
+    document.getElementById('prev-week').onclick = () => changeWeek(-1);
+    document.getElementById('next-week').onclick = () => changeWeek(1);
 
     document.addEventListener('mousemove', updateActivity);
     document.addEventListener('keypress', updateActivity);

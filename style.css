@@ -178,11 +178,22 @@ header {
 }
 
 .sidebar {
-    width: 320px;
+    width: 280px;
     flex-shrink: 0;
 }
 
-/* Common Card Style */
+.left-sidebar {
+    width: 260px;
+}
+
+.right-sidebar {
+    width: 300px;
+}
+
+.content {
+    flex-grow: 1;
+    min-width: 0;
+}
 .card {
     background: var(--card-bg);
     padding: 1.75rem;
