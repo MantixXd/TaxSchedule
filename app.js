@@ -342,7 +342,10 @@ function renderPayments() {
         listEl.appendChild(div);
     });
 
-    if (weekData.membersSnapshot) {
+    const realCurrentWeekKey = getWeekKey(new Date());
+    const viewingPastWeek = weekKey < realCurrentWeekKey;
+
+    if (weekData.membersSnapshot && viewingPastWeek) {
         const info = document.createElement('div');
         info.style.cssText = 'font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 10px; font-style: italic;';
         info.textContent = 'Zobrazen archivovaný seznam pro tento týden';
