@@ -392,9 +392,17 @@ async function togglePayment(member, status) {
             if (!payments[weekKey].status) payments[weekKey].status = {};
             payments[weekKey].status[member] = currentUsername;
         } else {
-            await apiDelete(`payments/${weekKey}/status/${member}`);
-            if (payments[weekKey] && payments[weekKey].status) {
-                delete payments[weekKey].status[member];
+            // Check if data is in the old flat format or new nested format
+            const isOldFormat = payments[weekKey] && payments[weekKey][member] && !payments[weekKey].status;
+            
+            if (isOldFormat) {
+                await apiDelete(`payments/${weekKey}/${member}`);
+                delete payments[weekKey][member];
+            } else {
+                await apiDelete(`payments/${weekKey}/status/${member}`);
+                if (payments[weekKey] && payments[weekKey].status) {
+                    delete payments[weekKey].status[member];
+                }
             }
         }
         renderPayments();
