@@ -42,6 +42,14 @@ function changeWeek(delta) {
     renderPayments();
 }
 
+function step(id, delta) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const newVal = Math.max(0, (parseInt(el.value) || 0) + delta);
+    el.value = newVal;
+    updateCalculation();
+}
+
 // --- API HELPERS ---
 async function apiGet(path) {
     const res = await fetch(`/api/data?path=${path}&_t=${Date.now()}`);
