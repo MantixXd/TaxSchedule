@@ -425,14 +425,20 @@ async function addMember() {
     }
 
     try {
-        // Fetch full members object to find key or handle array
-        const membersData = await apiGet('members');
         await apiPost('members', name);
         
-        // Refresh local list from server to be sure
+        // Refresh local list from server
         const updatedMembers = await apiGet('members');
         membersList = Array.isArray(updatedMembers) ? updatedMembers : Object.values(updatedMembers);
         
+        // SYNC WITH CURRENT WEEK SNAPSHOT:
+        // If we are looking at the current week and it already has a snapshot, update it
+        const realCurrentWeekKey = getWeekKey(new Date());
+        if (payments[realCurrentWeekKey] && payments[realCurrentWeekKey].membersSnapshot) {
+            await apiPut(`payments/${realCurrentWeekKey}/membersSnapshot`, membersList);
+            payments[realCurrentWeekKey].membersSnapshot = [...membersList];
+        }
+
         input.value = '';
         renderPayments();
     } catch (err) {
@@ -442,7 +448,6 @@ async function addMember() {
 
 async function removeMember(name) {
     try {
-        // Need to find the key for this name in Firebase
         const membersData = await apiGet('members');
         let targetKey = null;
         
@@ -458,6 +463,14 @@ async function removeMember(name) {
         if (targetKey !== null) {
             await apiDelete(`members/${targetKey}`);
             membersList = membersList.filter(m => m !== name);
+            
+            // SYNC WITH CURRENT WEEK SNAPSHOT:
+            const realCurrentWeekKey = getWeekKey(new Date());
+            if (payments[realCurrentWeekKey] && payments[realCurrentWeekKey].membersSnapshot) {
+                await apiPut(`payments/${realCurrentWeekKey}/membersSnapshot`, membersList);
+                payments[realCurrentWeekKey].membersSnapshot = [...membersList];
+            }
+
             renderPayments();
         }
     } catch (err) {
