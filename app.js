@@ -10,6 +10,31 @@ let parameters = {
     level: 0
 };
 let commitments = {};
+let membersList = [];
+let payments = {};
+
+// --- HELPERS ---
+function getWeekKey(date) {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    // Adjust to Thursday in current week to decide year
+    d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+    const yearStart = new Date(d.getFullYear(), 0, 1);
+    const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return `${d.getFullYear()}-W${weekNo}`;
+}
+
+function getWeekRange(date) {
+    const d = new Date(date);
+    const day = d.getDay() || 7;
+    const monday = new Date(d);
+    monday.setDate(d.getDate() - day + 1);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    
+    const format = (dt) => `${dt.getDate()}.${dt.getMonth() + 1}.`;
+    return `${format(monday)} - ${format(sunday)}`;
+}
 
 // --- API HELPERS ---
 async function apiGet(path) {
@@ -182,9 +207,11 @@ async function initApp() {
 
 async function loadData() {
     try {
-        const [paramsData, commitmentsData] = await Promise.all([
+        const [paramsData, commitmentsData, membersData, paymentsData] = await Promise.all([
             apiGet('parameters'),
-            apiGet('commitments')
+            apiGet('commitments'),
+            apiGet('members'),
+            apiGet('payments')
         ]);
         
         if (paramsData) {
@@ -198,9 +225,104 @@ async function loadData() {
         if (commitmentsData) {
             commitments = commitmentsData;
         }
+
+        if (membersData) {
+            // Convert object to array if needed (Firebase push keys)
+            membersList = Array.isArray(membersData) ? membersData : Object.values(membersData);
+        }
+
+        if (paymentsData) {
+            payments = paymentsData;
+        }
+
+        renderPayments();
     } catch (err) {
         console.error("Error loading data:", err);
     }
+}
+
+function renderPayments() {
+    const listEl = document.getElementById('members-payment-list');
+    const adminActions = document.getElementById('admin-member-actions');
+    const weekKey = getWeekKey(new Date()); // Always show current real week
+    const weekRange = getWeekRange(new Date());
+    
+    document.getElementById('current-week-display').textContent = weekRange;
+    
+    listEl.innerHTML = '';
+    
+    if (currentUsername === 'admin') {
+        adminActions.style.display = 'block';
+    }
+
+    const currentWeekPayments = payments[weekKey] || {};
+
+    membersList.sort().forEach(member => {
+        const isPaid = !!currentWeekPayments[member];
+        const div = document.createElement('div');
+        div.className = `payment-item ${isPaid ? 'paid' : ''}`;
+        
+        div.innerHTML = `
+            <span>${member}</span>
+            <div class="payment-controls">
+                <input type="checkbox" ${isPaid ? 'checked' : ''} ${currentUsername !== 'admin' ? 'disabled' : ''}>
+            </div>
+        `;
+
+        if (currentUsername === 'admin') {
+            div.onclick = (e) => {
+                if (e.target.tagName !== 'INPUT') {
+                    togglePayment(member, !isPaid);
+                }
+            };
+            const checkbox = div.querySelector('input');
+            checkbox.onchange = (e) => togglePayment(member, e.target.checked);
+        }
+
+        listEl.appendChild(div);
+    });
+}
+
+async function togglePayment(member, status) {
+    const weekKey = getWeekKey(new Date());
+    try {
+        if (status) {
+            await apiPut(`payments/${weekKey}/${member}`, true);
+            if (!payments[weekKey]) payments[weekKey] = {};
+            payments[weekKey][member] = true;
+        } else {
+            await apiDelete(`payments/${weekKey}/${member}`);
+            if (payments[weekKey]) delete payments[weekKey][member];
+        }
+        renderPayments();
+    } catch (err) {
+        showModal("Chyba", "Chyba při ukládání platby", null, true);
+    }
+}
+
+async function addMember() {
+    const input = document.getElementById('new-member-name');
+    const name = input.value.trim();
+    if (!name) return;
+
+    if (membersList.includes(name)) {
+        showModal("Info", "Tento člen již existuje", null, true);
+        return;
+    }
+
+    try {
+        await apiPost('members', name);
+        membersList.push(name);
+        input.value = '';
+        renderPayments();
+    } catch (err) {
+        showModal("Chyba", "Chyba při přidávání člena", null, true);
+    }
+}
+
+async function removeMember(name) {
+    // Pro zjednodušení teď jen přes konzoli nebo modal, pokud by bylo potřeba
+    // Ale v UI to teď nebudeme komplikovat, admin může jméno přidat
 }
 
 function updateCalculation() {
@@ -385,6 +507,11 @@ function setupEventListeners() {
             el.onchange = updateCalculation;
         }
     });
+
+    document.getElementById('add-member-btn').onclick = addMember;
+    document.getElementById('new-member-name').onkeypress = (e) => {
+        if (e.key === 'Enter') addMember();
+    };
 
     document.getElementById('prev-month').onclick = () => {
         currentMonth.setMonth(currentMonth.getMonth() - 1);

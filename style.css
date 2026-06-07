@@ -422,6 +422,43 @@ header {
     background: linear-gradient(135deg, #f39c12, #e67e22);
 }
 
+/* Payments List */
+#members-payment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+
+.payment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #252525;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.payment-item.paid {
+    background: rgba(76, 175, 80, 0.1);
+    border-color: rgba(76, 175, 80, 0.3);
+}
+
+.payment-item.paid span {
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+.payment-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .app-container {
