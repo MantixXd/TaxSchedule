@@ -271,6 +271,15 @@ async function loadData() {
             payments = paymentsData;
         }
 
+        // AUTO-SNAPSHOT: Ensure the current real week always has a snapshot
+        // This locks in the roster for the week even before the first payment.
+        const realCurrentWeekKey = getWeekKey(new Date());
+        if (membersList.length > 0 && (!payments[realCurrentWeekKey] || !payments[realCurrentWeekKey].membersSnapshot)) {
+            await apiPut(`payments/${realCurrentWeekKey}/membersSnapshot`, membersList);
+            if (!payments[realCurrentWeekKey]) payments[realCurrentWeekKey] = {};
+            payments[realCurrentWeekKey].membersSnapshot = [...membersList];
+        }
+
         renderPayments();
     } catch (err) {
         console.error("Error loading data:", err);
