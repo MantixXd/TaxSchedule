@@ -294,7 +294,18 @@ function renderPayments() {
     const statusKeys = (weekData.status) ? Object.keys(weekData.status) : Object.keys(weekData).filter(k => k !== 'membersSnapshot' && k !== 'status');
     const displayList = Array.from(new Set([...baseList, ...statusKeys]));
 
-    displayList.sort().forEach(member => {
+    // SORTING STRATEGY: Unpaid members first, then alphabetical
+    displayList.sort((a, b) => {
+        const aPaid = !!weekStatus[a];
+        const bPaid = !!weekStatus[b];
+        
+        if (aPaid !== bPaid) {
+            return aPaid ? 1 : -1; // Unpaid (false) comes before Paid (true)
+        }
+        return a.localeCompare(b); // Then alphabetical
+    });
+
+    displayList.forEach(member => {
         if (member === 'membersSnapshot' || member === 'status') return;
         const paidBy = weekStatus[member];
         const isPaid = !!paidBy;
