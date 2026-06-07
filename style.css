@@ -170,7 +170,7 @@ header {
 }
 
 .app-container {
-    max-width: 1600px;
+    max-width: 1800px; /* Increased from 1600px */
     margin: 2rem auto;
     padding: 0 1.5rem;
     display: flex;
@@ -187,7 +187,7 @@ header {
 }
 
 .right-sidebar {
-    width: 320px;
+    width: 340px; /* Slightly wider for snapshots info */
 }
 
 .content {
@@ -738,5 +738,8 @@ header {
     .day-user {
         font-size: 0.65rem;
         padding: 4px;
+    }
+}
+ padding: 4px;
     }
 }
