@@ -431,12 +431,15 @@ async function addMember() {
         const updatedMembers = await apiGet('members');
         membersList = Array.isArray(updatedMembers) ? updatedMembers : Object.values(updatedMembers);
         
-        // SYNC WITH CURRENT WEEK SNAPSHOT:
-        // If we are looking at the current week and it already has a snapshot, update it
+        // SYNC WITH CURRENT AND FUTURE SNAPSHOTS:
         const realCurrentWeekKey = getWeekKey(new Date());
-        if (payments[realCurrentWeekKey] && payments[realCurrentWeekKey].membersSnapshot) {
-            await apiPut(`payments/${realCurrentWeekKey}/membersSnapshot`, membersList);
-            payments[realCurrentWeekKey].membersSnapshot = [...membersList];
+        
+        // Iterate through all stored weeks and update snapshots for current or future weeks
+        for (const [weekKey, weekData] of Object.entries(payments)) {
+            if (weekKey >= realCurrentWeekKey && weekData.membersSnapshot) {
+                await apiPut(`payments/${weekKey}/membersSnapshot`, membersList);
+                payments[weekKey].membersSnapshot = [...membersList];
+            }
         }
 
         input.value = '';
@@ -464,11 +467,13 @@ async function removeMember(name) {
             await apiDelete(`members/${targetKey}`);
             membersList = membersList.filter(m => m !== name);
             
-            // SYNC WITH CURRENT WEEK SNAPSHOT:
+            // SYNC WITH CURRENT AND FUTURE SNAPSHOTS:
             const realCurrentWeekKey = getWeekKey(new Date());
-            if (payments[realCurrentWeekKey] && payments[realCurrentWeekKey].membersSnapshot) {
-                await apiPut(`payments/${realCurrentWeekKey}/membersSnapshot`, membersList);
-                payments[realCurrentWeekKey].membersSnapshot = [...membersList];
+            for (const [weekKey, weekData] of Object.entries(payments)) {
+                if (weekKey >= realCurrentWeekKey && weekData.membersSnapshot) {
+                    await apiPut(`payments/${weekKey}/membersSnapshot`, membersList);
+                    payments[weekKey].membersSnapshot = [...membersList];
+                }
             }
 
             renderPayments();
