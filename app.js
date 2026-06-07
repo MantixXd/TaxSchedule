@@ -265,14 +265,15 @@ function renderPayments() {
     
     listEl.innerHTML = '';
     
-    if (currentUsername === 'admin') {
+    const isAdmin = currentUsername === 'admin';
+    if (isAdmin) {
         adminActions.style.display = 'block';
     }
 
     const currentWeekPayments = payments[weekKey] || {};
 
     membersList.sort().forEach(member => {
-        const paidBy = currentWeekPayments[member]; // Now stores username string or true
+        const paidBy = currentWeekPayments[member];
         const isPaid = !!paidBy;
         const div = document.createElement('div');
         div.className = `payment-item ${isPaid ? 'paid' : ''}`;
@@ -282,27 +283,40 @@ function renderPayments() {
             metaHtml = `<small class="paid-meta">Přijal: ${getDisplayName(paidBy)}</small>`;
         }
 
+        const removeBtnHtml = isAdmin ? `<button class="remove-member-btn" title="Odebrat člena" style="display: block;">×</button>` : '';
+
         div.innerHTML = `
             <div class="payment-info">
                 <span class="member-name">${member}</span>
                 ${metaHtml}
             </div>
-            <div class="payment-controls">
+            <div style="display: flex; align-items: center;">
                 <label class="custom-checkbox">
-                    <input type="checkbox" ${isPaid ? 'checked' : ''} ${currentUsername !== 'admin' ? 'disabled' : ''}>
+                    <input type="checkbox" ${isPaid ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''}>
                     <span class="checkmark"></span>
                 </label>
+                ${removeBtnHtml}
             </div>
         `;
 
-        if (currentUsername === 'admin') {
+        if (isAdmin) {
+            // Toggle payment on row click (excluding checkbox and remove btn)
             div.onclick = (e) => {
-                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SPAN') {
+                if (e.target.tagName !== 'INPUT' && !e.target.classList.contains('remove-member-btn') && !e.target.classList.contains('checkmark')) {
                     togglePayment(member, !isPaid);
                 }
             };
+            
             const checkbox = div.querySelector('input');
             checkbox.onchange = (e) => togglePayment(member, e.target.checked);
+
+            const removeBtn = div.querySelector('.remove-member-btn');
+            if (removeBtn) {
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    showModal("Odebrat člena", `Opravdu chcete odebrat člena "${member}" ze seznamu?`, () => removeMember(member));
+                };
+            }
         }
 
         listEl.appendChild(div);
@@ -338,10 +352,14 @@ async function addMember() {
     }
 
     try {
-        // Find existing members list object if it's not an array
-        // apiPost pushes to the list
+        // Fetch full members object to find key or handle array
+        const membersData = await apiGet('members');
         await apiPost('members', name);
-        membersList.push(name);
+        
+        // Refresh local list from server to be sure
+        const updatedMembers = await apiGet('members');
+        membersList = Array.isArray(updatedMembers) ? updatedMembers : Object.values(updatedMembers);
+        
         input.value = '';
         renderPayments();
     } catch (err) {
@@ -350,7 +368,28 @@ async function addMember() {
 }
 
 async function removeMember(name) {
-    // Pro zjednodušení teď jen přes konzoli nebo modal, pokud by bylo potřeba
+    try {
+        // Need to find the key for this name in Firebase
+        const membersData = await apiGet('members');
+        let targetKey = null;
+        
+        if (membersData && typeof membersData === 'object') {
+            for (const [key, val] of Object.entries(membersData)) {
+                if (val === name) {
+                    targetKey = key;
+                    break;
+                }
+            }
+        }
+
+        if (targetKey !== null) {
+            await apiDelete(`members/${targetKey}`);
+            membersList = membersList.filter(m => m !== name);
+            renderPayments();
+        }
+    } catch (err) {
+        showModal("Chyba", "Chyba při odebírání člena", null, true);
+    }
 }
 
 function updateCalculation() {

@@ -642,8 +642,8 @@ header {
 
 /* Style the checkmark indicator */
 .custom-checkbox .checkmark:after {
-    left: 8px;
-    top: 3px;
+    left: 7px;
+    top: 2px;
     width: 6px;
     height: 12px;
     border: solid var(--success-color);
@@ -654,6 +654,28 @@ header {
 .custom-checkbox input:disabled ~ .checkmark {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.remove-member-btn {
+    background: transparent;
+    border: none;
+    color: var(--error-color);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    opacity: 0.4;
+    transition: all 0.2s;
+    margin-left: 8px;
+    display: none;
+}
+
+.payment-item:hover .remove-member-btn {
+    opacity: 1;
+}
+
+.remove-member-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
 }
 
 #admin-member-actions .param-group div {
