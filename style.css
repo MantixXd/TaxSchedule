@@ -234,6 +234,16 @@ header {
     transition: all 0.2s;
 }
 
+/* Style for number input arrows */
+.param-group input[type="number"]::-webkit-inner-spin-button,
+.param-group input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+    cursor: pointer;
+    background: var(--primary-color);
+    border-radius: 4px;
+    height: 24px;
+}
+
 .param-group input:focus {
     outline: none;
     border-color: var(--primary-color);
@@ -519,7 +529,17 @@ header {
     accent-color: var(--success-color);
 }
 
-/* Admin controls */
+#admin-member-actions .param-group div {
+    display: flex;
+    gap: 8px;
+    align-items: center; /* Center horizontally/vertically */
+}
+
+#new-member-name {
+    flex-grow: 1;
+    height: 38px; /* Match button height */
+}
+
 #add-member-btn {
     background: var(--primary-color);
     border: none;
@@ -528,16 +548,81 @@ header {
     font-weight: 800;
     width: 38px;
     height: 38px;
+    flex-shrink: 0;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
     transition: all 0.2s;
+    line-height: 1;
 }
 
 #add-member-btn:hover {
     background: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .app-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .calendar-grid {
+        gap: 5px;
+    }
+    .calendar-day {
+        min-height: 85px;
+        padding: 6px;
+    }
+    .day-number {
+        font-size: 0.8rem;
+    }
+    .day-user {
+        font-size: 0.65rem;
+        padding: 4px;
+    }
+}
+}
+
+#add-member-btn:hover {
+    background: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .app-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .calendar-grid {
+        gap: 5px;
+    }
+    .calendar-day {
+        min-height: 85px;
+        padding: 6px;
+    }
+    .day-number {
+        font-size: 0.8rem;
+    }
+    .day-user {
+        font-size: 0.65rem;
+        padding: 4px;
+    }
+}
+ckground: var(--primary-hover);
     transform: scale(1.05);
 }
 
