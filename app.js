@@ -260,26 +260,37 @@ function renderPayments() {
     const adminActions = document.getElementById('admin-member-actions');
     const weekKey = getWeekKey(currentWeekDate);
     const weekRange = getWeekRange(currentWeekDate);
-    
+
     document.getElementById('current-week-display').textContent = weekRange;
-    
+
     listEl.innerHTML = '';
-    
+
     const isAdmin = currentUsername === 'admin';
     if (isAdmin) {
         adminActions.style.display = 'block';
     }
 
-        const currentWeekPayments = payments[weekKey] || {};
+    const weekData = payments[weekKey] || {};
+    const weekStatus = weekData.status || weekData || {}; // Handle old data format too
 
-    membersList.sort().forEach(member => {
-        const paidBy = currentWeekPayments[member];
+    // Determine which member list to use
+    let displayList = [];
+    if (weekData.membersSnapshot) {
+        displayList = Array.isArray(weekData.membersSnapshot) ? weekData.membersSnapshot : Object.values(weekData.membersSnapshot);
+    } else {
+        displayList = [...membersList];
+    }
+
+    displayList.sort().forEach(member => {
+        // Find payment info (status can be a simple boolean or a string with admin name)
+        const paidBy = weekStatus[member];
         const isPaid = !!paidBy;
+
         const div = document.createElement('div');
         div.className = `payment-item ${isPaid ? 'paid' : ''}`;
-        
+
         let metaHtml = '';
-        if (isPaid && typeof paidBy === 'string') {
+        if (isPaid && typeof paidBy === 'string' && paidBy !== 'true') {
             metaHtml = `<small class="paid-meta">Přijal: ${getDisplayName(paidBy)}</small>`;
         }
 
@@ -308,6 +319,13 @@ function renderPayments() {
 
         listEl.appendChild(div);
     });
+
+    if (weekData.membersSnapshot) {
+        const info = document.createElement('div');
+        info.style.cssText = 'font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 10px; font-style: italic;';
+        info.textContent = 'Zobrazen archivovaný seznam pro tento týden';
+        listEl.appendChild(info);
+    }
 }
 
 function openMemberMgmt() {
@@ -323,14 +341,14 @@ function openMemberMgmt() {
             <span class="member-name">${member}</span>
             <button class="remove-member-btn" style="display: block; opacity: 1;">Odebrat</button>
         `;
-        
+
         div.querySelector('.remove-member-btn').onclick = () => {
             showModal("Smazat člena", `Opravdu chcete navždy odebrat člena "${member}"?`, async () => {
                 await removeMember(member);
                 openMemberMgmt(); // Refresh mgmt list
             });
         };
-        
+
         listEl.appendChild(div);
     });
 
@@ -341,13 +359,21 @@ async function togglePayment(member, status) {
     const weekKey = getWeekKey(currentWeekDate);
     try {
         if (status) {
-            // Store the username of the person who confirmed it
-            await apiPut(`payments/${weekKey}/${member}`, currentUsername);
-            if (!payments[weekKey]) payments[weekKey] = {};
-            payments[weekKey][member] = currentUsername;
+            // First time this week? Save snapshot of current members
+            if (!payments[weekKey] || !payments[weekKey].membersSnapshot) {
+                await apiPut(`payments/${weekKey}/membersSnapshot`, membersList);
+                if (!payments[weekKey]) payments[weekKey] = {};
+                payments[weekKey].membersSnapshot = [...membersList];
+            }
+
+            await apiPut(`payments/${weekKey}/status/${member}`, currentUsername);
+            if (!payments[weekKey].status) payments[weekKey].status = {};
+            payments[weekKey].status[member] = currentUsername;
         } else {
-            await apiDelete(`payments/${weekKey}/${member}`);
-            if (payments[weekKey]) delete payments[weekKey][member];
+            await apiDelete(`payments/${weekKey}/status/${member}`);
+            if (payments[weekKey] && payments[weekKey].status) {
+                delete payments[weekKey].status[member];
+            }
         }
         renderPayments();
     } catch (err) {
