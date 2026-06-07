@@ -17,11 +17,18 @@
     padding: 0;
 }
 
+html, body {
+    height: 100vh;
+    overflow: hidden; /* Prevents global scroll */
+}
+
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Scrollbars */
@@ -48,7 +55,7 @@ body {
 header {
     background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px);
     padding: 1rem 2rem; border-bottom: 1px solid var(--border-color);
-    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
 }
 .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1800px; margin: 0 auto; }
 .header-content h1 { font-weight: 800; background: linear-gradient(to right, #60a5fa, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -56,125 +63,134 @@ header {
 #logout-button { padding: 0.6rem 1.2rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #f87171; cursor: pointer; border-radius: 8px; font-weight: 700; transition: 0.2s; }
 #logout-button:hover { background: #ef4444; color: white; }
 
-/* Dashboard Layout - DEFINITIVE ALIGNMENT */
+#app-main-layout {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* DASHBOARD GRID */
 .app-container {
     max-width: 1800px;
-    margin: 2rem auto;
-    padding: 0 1.5rem;
-    display: flex;
-    gap: 2rem;
-    align-items: stretch; /* Middle and right columns stretch to match left sidebar */
+    width: 100%;
+    margin: 0 auto;
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 280px 1fr 340px;
+    gap: 1.5rem;
+    flex-grow: 1;
+    overflow: hidden; /* Critical to lock the grid in place */
 }
 
 .sidebar {
-    width: 280px;
-    flex-shrink: 0;
     display: flex;
     flex-direction: column;
+    min-height: 0;
 }
 
 .left-sidebar {
-    width: 260px;
+    overflow-y: auto; /* Left sidebar can scroll if it has many small cards */
 }
 
 .right-sidebar {
-    width: 340px;
+    min-height: 0;
 }
 
 .content {
-    flex-grow: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
+    min-height: 0;
 }
 
-/* Internal Card Logic to Fill Height */
+/* Universal Card Behavior */
 .card {
     background: var(--card-bg);
-    padding: 1.5rem;
+    padding: 1.25rem;
     border-radius: 16px;
     border: 1px solid var(--border-color);
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.content .card, .right-sidebar .card {
-    height: 100%; /* Fill the sidebar/content height */
-    margin-bottom: 0;
     display: flex;
     flex-direction: column;
 }
 
-.left-sidebar .card:last-child {
+/* Center and Right cards fill the height */
+.content .card, .right-sidebar .card {
+    height: 100%;
     margin-bottom: 0;
+    overflow: hidden;
 }
 
+.card h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-color); flex-shrink: 0; }
+
 /* Calendar Components */
-.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-.calendar-nav { display: flex; align-items: center; gap: 1rem; }
-.nav-btn { width: 36px; height: 36px; background: #0f172a; border: 1px solid var(--border-color); color: white; border-radius: 10px; cursor: pointer; }
+.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-shrink: 0; }
+.calendar-nav { display: flex; align-items: center; gap: 0.75rem; }
+.nav-btn { width: 32px; height: 32px; background: #0f172a; border: 1px solid var(--border-color); color: white; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
-    flex: 1;
-    overflow-y: auto; /* Internal scroll */
-    min-height: 0; /* Critical for flex scroll */
-    padding-right: 5px;
+    gap: 6px;
+    flex-grow: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 4px;
 }
 
 .calendar-day {
     min-height: 60px;
     background: rgba(15, 23, 42, 0.5);
-    padding: 8px;
+    padding: 6px;
     border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: 4px;
-    border-radius: 12px;
+    gap: 2px;
+    border-radius: 10px;
     transition: 0.2s;
 }
 .calendar-day.today { border-color: var(--primary-color); background: rgba(59, 130, 246, 0.1); }
-.day-number { font-weight: 700; font-size: 0.9rem; color: var(--text-muted); }
-.day-user { padding: 4px 8px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; text-align: center; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.day-number { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); }
+.day-user { padding: 3px 6px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; text-align: center; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Payment Components */
 #members-payment-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    min-height: 0;
+    margin-top: 0.5rem;
+    padding-right: 4px;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    flex: 1;
-    overflow-y: auto; /* Internal scroll */
-    min-height: 0; /* Critical for flex scroll */
-    margin-top: 1rem;
-    padding-right: 8px;
+    gap: 0.5rem;
 }
 
-.payment-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: #0f172a; border-radius: 12px; border: 1px solid var(--border-color); transition: 0.2s; }
+.payment-item { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.8rem; background: #0f172a; border-radius: 10px; border: 1px solid var(--border-color); transition: 0.2s; flex-shrink: 0; }
 .payment-item.paid { background: rgba(34, 197, 94, 0.05); border-color: rgba(34, 197, 94, 0.2); }
-.member-name { font-weight: 600; font-size: 0.95rem; }
+.member-name { font-weight: 600; font-size: 0.9rem; }
 .payment-item.paid .member-name { color: var(--success-color); }
-.paid-meta { font-size: 0.65rem; color: var(--text-muted); display: block; }
+.paid-meta { font-size: 0.6rem; color: var(--text-muted); display: block; }
 
 /* Custom Form Elements */
-.stepper { display: flex; background: #0f172a; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; }
-.stepper button { background: #1e293b; border: none; color: white; width: 40px; cursor: pointer; font-size: 1.2rem; }
-.stepper input { border: none !important; text-align: center; background: transparent !important; flex-grow: 1; padding: 0.8rem 0.5rem !important; color: white; font-weight: 700; }
+.stepper { display: flex; background: #0f172a; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+.stepper button { background: #1e293b; border: none; color: white; width: 36px; cursor: pointer; font-size: 1.1rem; }
+.stepper input { border: none !important; text-align: center; background: transparent !important; flex-grow: 1; padding: 0.6rem 0.4rem !important; color: white; font-weight: 700; width: 40px; }
 .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; }
 
-.calc-result { margin-top: 1.5rem; padding: 1rem; background: #0f172a; border-radius: 12px; border-left: 4px solid var(--primary-color); text-align: center; }
-.calc-result small { display: block; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; }
-.calc-result div { font-size: 1.4rem; font-weight: 800; }
-.btn-block { width: 100%; padding: 0.8rem; background: var(--success-color); border: none; color: white; border-radius: 10px; cursor: pointer; font-weight: 700; margin-top: 1.2rem; }
+.calc-result { margin-top: 1rem; padding: 0.8rem; background: #0f172a; border-radius: 10px; border-left: 4px solid var(--primary-color); text-align: center; flex-shrink: 0; }
+.calc-result small { display: block; color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; }
+.calc-result div { font-size: 1.25rem; font-weight: 800; }
+.btn-block { width: 100%; padding: 0.75rem; background: var(--success-color); border: none; color: white; border-radius: 10px; cursor: pointer; font-weight: 700; margin-top: 1rem; flex-shrink: 0; }
 
 /* Custom Checkbox */
-.custom-checkbox { position: relative; width: 24px; height: 24px; cursor: pointer; }
+.custom-checkbox { position: relative; width: 22px; height: 22px; cursor: pointer; flex-shrink: 0; }
 .custom-checkbox input { position: absolute; opacity: 0; }
-.checkmark { position: absolute; top: 0; left: 0; height: 24px; width: 24px; background: #0f172a; border: 2px solid var(--border-color); border-radius: 6px; }
+.checkmark { position: absolute; top: 0; left: 0; height: 22px; width: 22px; background: #0f172a; border: 2px solid var(--border-color); border-radius: 6px; }
 .custom-checkbox input:checked ~ .checkmark { border-color: var(--success-color); }
-.checkmark:after { content: ""; position: absolute; display: none; left: 7px; top: 2px; width: 6px; height: 12px; border: solid var(--success-color); border-width: 0 3px 3px 0; transform: rotate(45deg); }
+.checkmark:after { content: ""; position: absolute; display: none; left: 6px; top: 1px; width: 5px; height: 11px; border: solid var(--success-color); border-width: 0 3px 3px 0; transform: rotate(45deg); }
 .custom-checkbox input:checked ~ .checkmark:after { display: block; }
 
 /* Modals */
@@ -186,12 +202,13 @@ header {
 .modal-actions button.btn-primary { background: var(--primary-color); border: none; }
 
 /* Admin actions */
-.remove-member-btn { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #f87171; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; cursor: pointer; }
+.remove-member-btn { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #f87171; padding: 3px 6px; border-radius: 6px; font-size: 0.65rem; cursor: pointer; margin-left: 8px; flex-shrink: 0; }
 #add-member-btn { background: var(--primary-color); border: none; color: white; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; }
 
 /* Responsive */
-@media (max-width: 1024px) {
-    .app-container { flex-direction: column; align-items: stretch; }
-    .sidebar, .left-sidebar, .right-sidebar { width: 100%; }
+@media (max-width: 1200px) {
+    body { overflow-y: auto; height: auto; }
+    .app-container { grid-template-columns: 1fr; height: auto; overflow: visible; }
     .content .card, .right-sidebar .card { height: auto; }
+    .calendar-grid { overflow-y: visible; }
 }
