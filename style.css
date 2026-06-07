@@ -554,10 +554,19 @@ header {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    flex: 1; /* Grow to fill height */
+    height: 480px; /* Fixed height to match main layout */
     overflow-y: auto;
     margin-top: 1rem;
-    padding-right: 5px;
+    padding-right: 8px;
+}
+
+/* Custom scrollbar for the list */
+#members-payment-list::-webkit-scrollbar {
+    width: 6px;
+}
+#members-payment-list::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 10px;
 }
 
 .payment-item {
