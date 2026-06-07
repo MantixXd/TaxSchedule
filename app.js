@@ -213,7 +213,7 @@ function updateCalculation() {
     const totalDailyTax = members * 0.25 * claims * level * 15;
     document.getElementById('tax-amount').textContent = Math.round(totalDailyTax).toLocaleString() + " $";
 
-    // Měsíční (týdenní) nájem na člena: (celková denní daň * 7 / počet členů)
+    // Týdenní nájem na člena: (celková denní daň * 7 / počet členů)
     const rentPerMember = members > 0 ? (totalDailyTax * 7 / members) : 0;
     
     document.getElementById('rent-per-member').textContent = Math.round(rentPerMember).toLocaleString() + " $";
