@@ -270,7 +270,7 @@ function renderPayments() {
         adminActions.style.display = 'block';
     }
 
-    const currentWeekPayments = payments[weekKey] || {};
+        const currentWeekPayments = payments[weekKey] || {};
 
     membersList.sort().forEach(member => {
         const paidBy = currentWeekPayments[member];
@@ -283,8 +283,6 @@ function renderPayments() {
             metaHtml = `<small class="paid-meta">Přijal: ${getDisplayName(paidBy)}</small>`;
         }
 
-        const removeBtnHtml = isAdmin ? `<button class="remove-member-btn" title="Odebrat člena" style="display: block;">×</button>` : '';
-
         div.innerHTML = `
             <div class="payment-info">
                 <span class="member-name">${member}</span>
@@ -295,32 +293,48 @@ function renderPayments() {
                     <input type="checkbox" ${isPaid ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''}>
                     <span class="checkmark"></span>
                 </label>
-                ${removeBtnHtml}
             </div>
         `;
 
         if (isAdmin) {
-            // Toggle payment on row click (excluding checkbox and remove btn)
             div.onclick = (e) => {
-                if (e.target.tagName !== 'INPUT' && !e.target.classList.contains('remove-member-btn') && !e.target.classList.contains('checkmark')) {
+                if (e.target.tagName !== 'INPUT' && !e.target.classList.contains('checkmark')) {
                     togglePayment(member, !isPaid);
                 }
             };
-            
             const checkbox = div.querySelector('input');
             checkbox.onchange = (e) => togglePayment(member, e.target.checked);
-
-            const removeBtn = div.querySelector('.remove-member-btn');
-            if (removeBtn) {
-                removeBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    showModal("Odebrat člena", `Opravdu chcete odebrat člena "${member}" ze seznamu?`, () => removeMember(member));
-                };
-            }
         }
 
         listEl.appendChild(div);
     });
+}
+
+function openMemberMgmt() {
+    const modal = document.getElementById('member-mgmt-modal');
+    const listEl = document.getElementById('mgmt-member-list');
+    listEl.innerHTML = '';
+
+    membersList.sort().forEach(member => {
+        const div = document.createElement('div');
+        div.className = 'payment-item';
+        div.style.cursor = 'default';
+        div.innerHTML = `
+            <span class="member-name">${member}</span>
+            <button class="remove-member-btn" style="display: block; opacity: 1;">Odebrat</button>
+        `;
+        
+        div.querySelector('.remove-member-btn').onclick = () => {
+            showModal("Smazat člena", `Opravdu chcete navždy odebrat člena "${member}"?`, async () => {
+                await removeMember(member);
+                openMemberMgmt(); // Refresh mgmt list
+            });
+        };
+        
+        listEl.appendChild(div);
+    });
+
+    modal.style.display = 'flex';
 }
 
 async function togglePayment(member, status) {
@@ -592,6 +606,16 @@ function setupEventListeners() {
 
     document.getElementById('prev-week').onclick = () => changeWeek(-1);
     document.getElementById('next-week').onclick = () => changeWeek(1);
+
+    const mgmtBtn = document.getElementById('manage-members-btn');
+    if (mgmtBtn) mgmtBtn.onclick = openMemberMgmt;
+
+    const closeMgmtBtn = document.getElementById('close-mgmt-btn');
+    if (closeMgmtBtn) {
+        closeMgmtBtn.onclick = () => {
+            document.getElementById('member-mgmt-modal').style.display = 'none';
+        };
+    }
 
     document.addEventListener('mousemove', updateActivity);
     document.addEventListener('keypress', updateActivity);
