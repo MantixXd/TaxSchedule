@@ -208,13 +208,19 @@ function updateCalculation() {
     const claims = parseInt(document.getElementById('param-claims').value) || 0;
     const level = parseInt(document.getElementById('param-level').value) || 0;
     
-    // Vzorec: Počet členů * 0.25 * Počet claimů * Level * 15
-    // Tato částka se bere jako 'denní částka' pro celou skupinu
-    const amount = members * 0.25 * claims * level * 15;
-    document.getElementById('tax-amount').textContent = Math.round(amount).toLocaleString() + " $";
+    // Denní základ (např. daň za claimy a level)
+    const dailyBase = 0.25 * claims * level * 15;
+    
+    // Celková daň za skupinu (vynásobená počtem členů)
+    const totalTax = members * dailyBase;
+    document.getElementById('tax-amount').textContent = Math.round(totalTax).toLocaleString() + " $";
 
-    // Vzorec pro nájem: (denní částka * 7 / počet členů)
-    const rentPerMember = members > 0 ? (amount * 7 / members) : 0;
+    // Měsíční nájem na člena: (celková denní daň * 7 / počet členů)
+    // Pokud je denní daň počítána jako (dailyBase * members), 
+    // pak nájem na člena je prostě dailyBase * 7.
+    // Ale pokud se "Denní částka" bere jako fixní základ (dailyBase), pak:
+    const rentPerMember = members > 0 ? (dailyBase * 7 / members) : 0;
+    
     document.getElementById('rent-per-member').textContent = Math.round(rentPerMember).toLocaleString() + " $";
 }
 
@@ -377,9 +383,13 @@ function setupEventListeners() {
     document.getElementById('logout-button').onclick = logout;
     document.getElementById('save-params').onclick = saveParameters;
     
-    document.getElementById('param-members').oninput = updateCalculation;
-    document.getElementById('param-claims').oninput = updateCalculation;
-    document.getElementById('param-level').oninput = updateCalculation;
+    ['param-members', 'param-claims', 'param-level'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.oninput = updateCalculation;
+            el.onchange = updateCalculation;
+        }
+    });
 
     document.getElementById('prev-month').onclick = () => {
         currentMonth.setMonth(currentMonth.getMonth() - 1);
