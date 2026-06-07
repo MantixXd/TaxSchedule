@@ -281,12 +281,13 @@ function renderPayments() {
     const adminActions = document.getElementById('admin-member-actions');
     const weekKey = getWeekKey(currentWeekDate);
     const weekRange = getWeekRange(currentWeekDate);
-
+    
     document.getElementById('current-week-display').textContent = weekRange;
-
+    
     listEl.innerHTML = '';
-
-    const isAdmin = currentUsername === 'admin';
+    
+    // Everyone who has access is a manager/admin
+    const isAdmin = !!currentUsername; 
     if (isAdmin) {
         adminActions.style.display = 'block';
     }
@@ -303,7 +304,7 @@ function renderPayments() {
     }
 
     displayList.sort().forEach(member => {
-        // Find payment info (status can be a simple boolean or a string with admin name)
+        // Find payment info
         const paidBy = weekStatus[member];
         const isPaid = !!paidBy;
 
@@ -322,21 +323,21 @@ function renderPayments() {
             </div>
             <div style="display: flex; align-items: center;">
                 <label class="custom-checkbox">
-                    <input type="checkbox" ${isPaid ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''}>
+                    <input type="checkbox" ${isPaid ? 'checked' : ''}>
                     <span class="checkmark"></span>
                 </label>
             </div>
         `;
 
-        if (isAdmin) {
-            div.onclick = (e) => {
-                if (e.target.tagName !== 'INPUT' && !e.target.classList.contains('checkmark')) {
-                    togglePayment(member, !isPaid);
-                }
-            };
-            const checkbox = div.querySelector('input');
-            checkbox.onchange = (e) => togglePayment(member, e.target.checked);
-        }
+        // Click on the row to toggle (as long as it's not the checkbox itself)
+        div.onclick = (e) => {
+            if (e.target.tagName !== 'INPUT' && !e.target.classList.contains('checkmark')) {
+                togglePayment(member, !isPaid);
+            }
+        };
+        
+        const checkbox = div.querySelector('input');
+        checkbox.onchange = (e) => togglePayment(member, e.target.checked);
 
         listEl.appendChild(div);
     });
