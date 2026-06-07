@@ -170,11 +170,12 @@ header {
 }
 
 .app-container {
-    max-width: 1800px; /* Increased from 1600px */
+    max-width: 1800px;
     margin: 2rem auto;
     padding: 0 1.5rem;
     display: flex;
     gap: 2rem;
+    align-items: stretch; /* All columns have same height */
 }
 
 .sidebar {
@@ -187,12 +188,16 @@ header {
 }
 
 .right-sidebar {
-    width: 340px; /* Slightly wider for snapshots info */
+    width: 340px;
+    display: flex;
+    flex-direction: column;
 }
 
 .content {
     flex-grow: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Stepper Component */
@@ -236,8 +241,8 @@ header {
 }
 
 /* Hide native arrows */
-.stepper input::-webkit-outer-spin-button,
-.stepper input::-webkit-inner-spin-button {
+.stepper input[type=number]::-webkit-outer-spin-button,
+.stepper input[type=number]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
@@ -247,11 +252,22 @@ header {
 
 .card {
     background: var(--card-bg);
-    padding: 1.75rem;
+    padding: 1.5rem;
     border-radius: 16px;
     border: 1px solid var(--border-color);
     margin-bottom: 2rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.content .card, .right-sidebar .card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+}
+
+.left-sidebar .card:last-child {
+    margin-bottom: 0;
 }
 
 .card h2 {
@@ -283,16 +299,6 @@ header {
     width: 100%;
     font-size: 1rem;
     transition: all 0.2s;
-}
-
-/* Style for number input arrows */
-.param-group input[type="number"]::-webkit-inner-spin-button,
-.param-group input[type="number"]::-webkit-outer-spin-button {
-    opacity: 1;
-    cursor: pointer;
-    background: var(--primary-color);
-    border-radius: 4px;
-    height: 24px;
 }
 
 .param-group input:focus {
@@ -465,16 +471,18 @@ header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 10px;
+    flex: 1;
 }
 
 .calendar-day {
-    min-height: 110px;
+    min-height: 55px; /* Reduced further to align better */
     background: rgba(15, 23, 42, 0.5);
-    padding: 12px;
+    padding: 8px;
     border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 4px;
     cursor: pointer;
     transition: all 0.2s;
     border-radius: 12px;
@@ -536,7 +544,7 @@ header {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    margin-top: 0.5rem;
+    margin-top: 0.2rem;
     color: #fff;
     text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
@@ -546,7 +554,7 @@ header {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    max-height: 400px;
+    flex: 1; /* Grow to fill height */
     overflow-y: auto;
     margin-top: 1rem;
     padding-right: 5px;
@@ -738,8 +746,5 @@ header {
     .day-user {
         font-size: 0.65rem;
         padding: 4px;
-    }
-}
- padding: 4px;
     }
 }

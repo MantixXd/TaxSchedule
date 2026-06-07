@@ -217,6 +217,27 @@ async function initApp() {
     await loadData();
     renderCalendar();
     setupEventListeners();
+    matchHeights();
+    window.addEventListener('resize', matchHeights);
+}
+
+function matchHeights() {
+    if (window.innerWidth <= 1024) {
+        // Reset heights on mobile
+        document.querySelector('.content .card').style.height = 'auto';
+        document.querySelector('.right-sidebar .card').style.height = 'auto';
+        return;
+    }
+
+    const leftSidebar = document.querySelector('.left-sidebar');
+    const contentCard = document.querySelector('.content .card');
+    const rightCard = document.querySelector('.right-sidebar .card');
+
+    if (leftSidebar && contentCard && rightCard) {
+        const targetHeight = leftSidebar.offsetHeight - 32; // -32 for card margin-bottom compensation
+        contentCard.style.height = targetHeight + 'px';
+        rightCard.style.height = targetHeight + 'px';
+    }
 }
 
 async function loadData() {
