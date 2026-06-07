@@ -552,7 +552,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1.25rem;
+    padding: 0.75rem 1rem;
     background: #0f172a;
     border-radius: 12px;
     border: 1px solid var(--border-color);
@@ -564,20 +564,96 @@ header {
     border-color: rgba(34, 197, 94, 0.2);
 }
 
-.payment-item span {
+.payment-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.member-name {
     font-weight: 600;
     font-size: 0.95rem;
 }
 
-.payment-item.paid span {
+.payment-item.paid .member-name {
     color: var(--success-color);
 }
 
-.payment-item input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
+.paid-meta {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Custom Checkbox Styling */
+.custom-checkbox {
+    display: block;
+    position: relative;
+    width: 24px;
+    height: 24px;
     cursor: pointer;
-    accent-color: var(--success-color);
+    user-select: none;
+}
+
+/* Hide default checkbox */
+.custom-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Create custom checkmark */
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 24px;
+    width: 24px;
+    background-color: #0f172a;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+/* On mouse-over, add background color */
+.custom-checkbox:hover input ~ .checkmark {
+    border-color: var(--primary-color);
+}
+
+/* When checked, add background and success border */
+.custom-checkbox input:checked ~ .checkmark {
+    background-color: rgba(34, 197, 94, 0.2);
+    border-color: var(--success-color);
+}
+
+/* Create the checkmark indicator */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show indicator when checked */
+.custom-checkbox input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the checkmark indicator */
+.custom-checkbox .checkmark:after {
+    left: 8px;
+    top: 3px;
+    width: 6px;
+    height: 12px;
+    border: solid var(--success-color);
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+.custom-checkbox input:disabled ~ .checkmark {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 #admin-member-actions .param-group div {

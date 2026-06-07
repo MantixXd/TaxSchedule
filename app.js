@@ -272,20 +272,32 @@ function renderPayments() {
     const currentWeekPayments = payments[weekKey] || {};
 
     membersList.sort().forEach(member => {
-        const isPaid = !!currentWeekPayments[member];
+        const paidBy = currentWeekPayments[member]; // Now stores username string or true
+        const isPaid = !!paidBy;
         const div = document.createElement('div');
         div.className = `payment-item ${isPaid ? 'paid' : ''}`;
         
+        let metaHtml = '';
+        if (isPaid && typeof paidBy === 'string') {
+            metaHtml = `<small class="paid-meta">Přijal: ${getDisplayName(paidBy)}</small>`;
+        }
+
         div.innerHTML = `
-            <span>${member}</span>
+            <div class="payment-info">
+                <span class="member-name">${member}</span>
+                ${metaHtml}
+            </div>
             <div class="payment-controls">
-                <input type="checkbox" ${isPaid ? 'checked' : ''} ${currentUsername !== 'admin' ? 'disabled' : ''}>
+                <label class="custom-checkbox">
+                    <input type="checkbox" ${isPaid ? 'checked' : ''} ${currentUsername !== 'admin' ? 'disabled' : ''}>
+                    <span class="checkmark"></span>
+                </label>
             </div>
         `;
 
         if (currentUsername === 'admin') {
             div.onclick = (e) => {
-                if (e.target.tagName !== 'INPUT') {
+                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SPAN') {
                     togglePayment(member, !isPaid);
                 }
             };
@@ -301,9 +313,10 @@ async function togglePayment(member, status) {
     const weekKey = getWeekKey(currentWeekDate);
     try {
         if (status) {
-            await apiPut(`payments/${weekKey}/${member}`, true);
+            // Store the username of the person who confirmed it
+            await apiPut(`payments/${weekKey}/${member}`, currentUsername);
             if (!payments[weekKey]) payments[weekKey] = {};
-            payments[weekKey][member] = true;
+            payments[weekKey][member] = currentUsername;
         } else {
             await apiDelete(`payments/${weekKey}/${member}`);
             if (payments[weekKey]) delete payments[weekKey][member];
