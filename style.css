@@ -359,6 +359,10 @@ header {
     backdrop-filter: blur(8px);
 }
 
+#custom-modal {
+    z-index: 3000; /* Ensure confirmation is always on top of other modals */
+}
+
 .modal-box {
     background: var(--card-bg);
     padding: 2.5rem;
