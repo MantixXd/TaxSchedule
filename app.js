@@ -327,16 +327,24 @@ function renderPayments() {
     const weekData = payments[weekKey] || {};
     const weekStatus = weekData.status || weekData || {}; 
 
+    const realCurrentWeekKey = getWeekKey(new Date());
+    const viewingPastWeek = weekKey < realCurrentWeekKey;
+
     // Determine which member list to use
     let baseList = [];
     if (weekData.membersSnapshot) {
+        // We have a snapshot, use it exclusively
         baseList = Array.isArray(weekData.membersSnapshot) ? weekData.membersSnapshot : Object.values(weekData.membersSnapshot);
-    } else {
+    } else if (!viewingPastWeek) {
+        // No snapshot yet, but we are looking at CURRENT or FUTURE week: use live list
         baseList = [...membersList];
+    } else {
+        // PAST WEEK and NO SNAPSHOT: show nothing by default (empty)
+        baseList = [];
     }
 
     // ENSURE HISTORICAL VISIBILITY:
-    // Even if not in snapshot/roster, show anyone who has a recorded payment in this week
+    // Always include anyone who actually has a recorded payment, even if snapshot is missing
     const statusKeys = (weekData.status) ? Object.keys(weekData.status) : Object.keys(weekData).filter(k => k !== 'membersSnapshot' && k !== 'status');
     const displayList = Array.from(new Set([...baseList, ...statusKeys]));
 
