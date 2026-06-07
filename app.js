@@ -209,7 +209,6 @@ async function initApp() {
     try { await loadData(); } catch (err) { console.error("Chyba při loadData:", err); }
     try { renderCalendar(); } catch (err) { console.error("Chyba při renderCalendar:", err); }
     try { setupEventListeners(); } catch (err) { console.error("Chyba při setupEventListeners:", err); }
-    try { matchHeights(); window.addEventListener('resize', matchHeights); } catch (err) { console.error("Chyba při matchHeights:", err); }
     
     // Background maintenance
     cleanupGhostData().catch(err => console.error("Mantenance pád:", err));
@@ -227,21 +226,6 @@ async function cleanupGhostData() {
         } catch (err) { console.error(`Smazání týdne ${weekKey} selhalo:`, err); }
     }
     if (needsRefresh) renderPayments();
-}
-
-function matchHeights() {
-    const contentCard = document.querySelector('.content .card');
-    const rightCard = document.querySelector('.right-sidebar .card');
-    const leftSidebar = document.querySelector('.left-sidebar');
-    if (!contentCard || !rightCard || !leftSidebar) return;
-    if (window.innerWidth <= 1024) {
-        contentCard.style.height = 'auto';
-        rightCard.style.height = 'auto';
-        return;
-    }
-    const targetHeight = leftSidebar.offsetHeight - 32;
-    contentCard.style.height = targetHeight + 'px';
-    rightCard.style.height = targetHeight + 'px';
 }
 
 async function loadData() {
