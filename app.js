@@ -7,7 +7,8 @@ let currentMonth = new Date();
 let parameters = {
     members: 0,
     claims: 0,
-    level: 0
+    level: 0,
+    rentDaily: 0
 };
 let commitments = {};
 
@@ -192,6 +193,7 @@ async function loadData() {
             document.getElementById('param-members').value = parameters.members;
             document.getElementById('param-claims').value = parameters.claims;
             document.getElementById('param-level').value = parameters.level;
+            document.getElementById('rent-daily').value = parameters.rentDaily || 0;
             updateCalculation();
         }
 
@@ -207,10 +209,15 @@ function updateCalculation() {
     const members = parseInt(document.getElementById('param-members').value) || 0;
     const claims = parseInt(document.getElementById('param-claims').value) || 0;
     const level = parseInt(document.getElementById('param-level').value) || 0;
+    const rentDaily = parseInt(document.getElementById('rent-daily').value) || 0;
     
     // Vzorec: Počet členů * 0.25 * Počet claimů * Level * 15
     const amount = members * 0.25 * claims * level * 15;
     document.getElementById('tax-amount').textContent = Math.round(amount).toLocaleString() + " $";
+
+    // Vzorec pro nájem: (denní částka * 7 / počet členů)
+    const rentPerMember = members > 0 ? (rentDaily * 7 / members) : 0;
+    document.getElementById('rent-per-member').textContent = Math.round(rentPerMember).toLocaleString() + " $";
 }
 
 async function saveParameters() {
@@ -221,7 +228,8 @@ async function saveParameters() {
     const newParams = {
         members: parseInt(document.getElementById('param-members').value) || 0,
         claims: parseInt(document.getElementById('param-claims').value) || 0,
-        level: parseInt(document.getElementById('param-level').value) || 0
+        level: parseInt(document.getElementById('param-level').value) || 0,
+        rentDaily: parseInt(document.getElementById('rent-daily').value) || 0
     };
 
     try {
@@ -375,6 +383,7 @@ function setupEventListeners() {
     document.getElementById('param-members').oninput = updateCalculation;
     document.getElementById('param-claims').oninput = updateCalculation;
     document.getElementById('param-level').oninput = updateCalculation;
+    document.getElementById('rent-daily').oninput = updateCalculation;
 
     document.getElementById('prev-month').onclick = () => {
         currentMonth.setMonth(currentMonth.getMonth() - 1);
