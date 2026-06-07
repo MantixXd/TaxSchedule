@@ -208,18 +208,13 @@ function updateCalculation() {
     const claims = parseInt(document.getElementById('param-claims').value) || 0;
     const level = parseInt(document.getElementById('param-level').value) || 0;
     
-    // Denní základ (např. daň za claimy a level)
-    const dailyBase = 0.25 * claims * level * 15;
-    
-    // Celková daň za skupinu (vynásobená počtem členů)
-    const totalTax = members * dailyBase;
-    document.getElementById('tax-amount').textContent = Math.round(totalTax).toLocaleString() + " $";
+    // Celková denní daň za celou skupinu
+    // Vzorec: Počet členů * 0.25 * Počet claimů * Level * 15
+    const totalDailyTax = members * 0.25 * claims * level * 15;
+    document.getElementById('tax-amount').textContent = Math.round(totalDailyTax).toLocaleString() + " $";
 
-    // Měsíční nájem na člena: (celková denní daň * 7 / počet členů)
-    // Pokud je denní daň počítána jako (dailyBase * members), 
-    // pak nájem na člena je prostě dailyBase * 7.
-    // Ale pokud se "Denní částka" bere jako fixní základ (dailyBase), pak:
-    const rentPerMember = members > 0 ? (dailyBase * 7 / members) : 0;
+    // Měsíční (týdenní) nájem na člena: (celková denní daň * 7 / počet členů)
+    const rentPerMember = members > 0 ? (totalDailyTax * 7 / members) : 0;
     
     document.getElementById('rent-per-member').textContent = Math.round(rentPerMember).toLocaleString() + " $";
 }
