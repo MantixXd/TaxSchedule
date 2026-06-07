@@ -245,22 +245,21 @@ async function cleanupGhostData() {
 }
 
 function matchHeights() {
+    const contentCard = document.querySelector('.content .card');
+    const rightCard = document.querySelector('.right-sidebar .card');
+    const leftSidebar = document.querySelector('.left-sidebar');
+
+    if (!contentCard || !rightCard || !leftSidebar) return;
+
     if (window.innerWidth <= 1024) {
-        // Reset heights on mobile
-        document.querySelector('.content .card').style.height = 'auto';
-        document.querySelector('.right-sidebar .card').style.height = 'auto';
+        contentCard.style.height = 'auto';
+        rightCard.style.height = 'auto';
         return;
     }
 
-    const leftSidebar = document.querySelector('.left-sidebar');
-    const contentCard = document.querySelector('.content .card');
-    const rightCard = document.querySelector('.right-sidebar .card');
-
-    if (leftSidebar && contentCard && rightCard) {
-        const targetHeight = leftSidebar.offsetHeight - 32; // -32 for card margin-bottom compensation
-        contentCard.style.height = targetHeight + 'px';
-        rightCard.style.height = targetHeight + 'px';
-    }
+    const targetHeight = leftSidebar.offsetHeight - 32;
+    contentCard.style.height = targetHeight + 'px';
+    rightCard.style.height = targetHeight + 'px';
 }
 
 async function loadData() {
