@@ -216,10 +216,32 @@ function setupLogin() {
 // --- APP LOGIC ---
 async function initApp() {
     await loadData();
+    await cleanupGhostData(); // Purge old corrupted data
     renderCalendar();
     setupEventListeners();
     matchHeights();
     window.addEventListener('resize', matchHeights);
+}
+
+async function cleanupGhostData() {
+    const APP_START_WEEK = "2026-W23"; // 1.6. - 7.6. 2026
+    let needsRefresh = false;
+
+    for (const weekKey of Object.keys(payments)) {
+        // Find keys that are older than start but were corrupted by sorting bug
+        // or keys that have incorrect format (no padding)
+        const isOld = weekKey < APP_START_WEEK;
+        const isMalformed = !weekKey.match(/^\d{4}-W\d{2}$/);
+        
+        if (isOld || isMalformed) {
+            console.log("Cleaning up ghost week:", weekKey);
+            await apiDelete(`payments/${weekKey}`);
+            delete payments[weekKey];
+            needsRefresh = true;
+        }
+    }
+
+    if (needsRefresh) renderPayments();
 }
 
 function matchHeights() {
