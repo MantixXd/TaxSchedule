@@ -237,8 +237,3 @@ header {
     .sidebar, .content, .right-sidebar { width: 100%; height: auto; margin-bottom: 1.5rem; }
     #members-payment-list, .calendar-grid { overflow-y: visible; height: auto; }
 }
-uto; height: auto; }
-    #app-main-layout, .app-container { height: auto; overflow: visible; display: block; }
-    .sidebar, .content, .right-sidebar { width: 100%; height: auto; margin-bottom: 1.5rem; }
-    #members-payment-list, .calendar-grid { overflow-y: visible; height: auto; }
-}
