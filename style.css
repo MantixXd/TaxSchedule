@@ -17,15 +17,19 @@
     padding: 0;
 }
 
+html, body {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
 body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.5;
-    height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* App is a single-screen dashboard */
 }
 
 /* Scrollbars */
@@ -34,7 +38,7 @@ body {
 ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-/* Login Overlay - RESTORED TO PROFESSIONAL LOOK */
+/* Login Overlay */
 .overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(15, 23, 42, 0.98); display: flex; justify-content: center; align-items: center;
@@ -53,15 +57,13 @@ body {
 .login-box input { 
     width: 100%; padding: 1rem; margin-bottom: 1.25rem; border-radius: 10px; 
     border: 1px solid var(--border-color); background: #0f172a; color: white; 
-    font-size: 1rem; transition: border-color 0.2s;
+    font-size: 1rem;
 }
-.login-box input:focus { outline: none; border-color: var(--primary-color); }
 .login-box button { 
     width: 100%; padding: 1rem; background: var(--primary-color); border: none; 
     color: white; border-radius: 10px; cursor: pointer; font-weight: 700; 
-    font-size: 1rem; transition: background 0.2s; 
+    font-size: 1rem;
 }
-.login-box button:hover { background: var(--primary-hover); }
 
 /* Header */
 header {
@@ -76,94 +78,138 @@ header {
 #logout-button { padding: 0.5rem 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #f87171; border-radius: 8px; cursor: pointer; font-weight: 700; transition: 0.2s; }
 #logout-button:hover { background: #ef4444; color: white; }
 
-/* Dashboard Container */
+/* Dashboard Core Layout - DEFINITIVE HEIGHT LOCK */
 #app-main-layout {
-    flex-grow: 1; display: flex; flex-direction: column; min-height: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 0; /* Forces flex child to stay within allocated space */
+    min-height: 0;
+    overflow: hidden;
 }
 
 .app-container {
-    max-width: 1800px; width: 100%; margin: 0 auto; padding: 1.5rem;
-    display: flex; gap: 1.5rem; flex-grow: 1; align-items: stretch; /* ALL COLUMNS MATCH HEIGHT */
+    max-width: 1800px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1.5rem;
+    display: flex;
+    gap: 1.5rem;
+    flex: 1;
+    height: 0; /* Forces container to stay within viewport */
     min-height: 0;
+    align-items: stretch;
+    overflow: hidden;
 }
 
 /* Columns */
-.sidebar { 
-    width: 280px; flex-shrink: 0; display: flex; flex-direction: column; 
-    min-height: 0; /* Critical for shrinking */
+.sidebar, .content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
 }
-.content { 
-    flex-grow: 1; min-width: 0; display: flex; flex-direction: column; 
-    min-height: 0; /* Critical for shrinking */
-}
-.right-sidebar { width: 340px; display: flex; flex-direction: column; min-height: 0; }
+
+.sidebar { width: 280px; flex-shrink: 0; }
+.content { flex-grow: 1; min-width: 0; }
+.right-sidebar { width: 340px; }
 
 /* Cards */
 .card {
-    background: var(--card-bg); border: 1px solid var(--border-color);
-    border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    min-height: 0; /* Allow card to shrink below content */
 }
-.card h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.25rem; flex-shrink: 0; }
 
-/* Center and Right fill height */
-.content .card, .right-sidebar .card { height: 100%; }
+.content .card, .right-sidebar .card {
+    height: 100%;
+}
 
-/* Left sidebar special layout */
 .left-sidebar { gap: 1.5rem; overflow-y: auto; padding-right: 4px; }
 .left-sidebar .card { flex-shrink: 0; }
-.left-sidebar .card:first-child { flex-grow: 1; }
 
-/* Calendar Components */
+.card h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.25rem; flex-shrink: 0; }
+
+/* Calendar */
 .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-shrink: 0; }
 .calendar-nav { display: flex; align-items: center; gap: 0.5rem; }
 .nav-btn { width: 34px; height: 34px; background: #0f172a; border: 1px solid var(--border-color); color: white; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
 .calendar-grid {
-    display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
-    flex-grow: 1; overflow-y: auto; min-height: 0; padding-right: 4px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 4px;
 }
+
 .calendar-day {
-    min-height: 60px; background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color);
-    border-radius: 10px; padding: 6px; display: flex; flex-direction: column; gap: 2px;
+    min-height: 60px;
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 .calendar-day.today { border-color: var(--primary-color); background: rgba(59, 130, 246, 0.1); }
 .calendar-day.header-day { min-height: auto; border: none; background: transparent; font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; text-align: center; }
 .day-number { font-weight: 700; font-size: 0.8rem; color: var(--text-muted); }
 .day-user { padding: 3px 6px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; text-align: center; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* Payments */
+/* Payments - GUARANTEED SCROLLING */
 #members-payment-list {
-    flex-grow: 1; overflow-y: auto; min-height: 0; display: flex; flex-direction: column; gap: 0.6rem; padding-right: 8px;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding-right: 8px;
+    margin-bottom: 0.5rem;
 }
+
 .payment-item {
-    flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.8rem; 
-    background: #0f172a; border: 1px solid var(--border-color); border-radius: 10px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.8rem;
+    background: #0f172a;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
 }
 .payment-item.paid { background: rgba(34, 197, 94, 0.05); border-color: rgba(34, 197, 94, 0.2); }
 .member-name { font-weight: 600; font-size: 0.85rem; }
 .paid-meta { font-size: 0.6rem; color: var(--text-muted); font-style: italic; }
 
-/* Custom Checkbox */
-.custom-checkbox { position: relative; width: 22px; height: 22px; cursor: pointer; }
+/* Checkbox */
+.custom-checkbox { position: relative; width: 22px; height: 22px; cursor: pointer; flex-shrink: 0; }
 .custom-checkbox input { position: absolute; opacity: 0; }
 .checkmark { position: absolute; top: 0; left: 0; height: 22px; width: 22px; background: #0f172a; border: 2px solid var(--border-color); border-radius: 6px; }
 .custom-checkbox input:checked ~ .checkmark { border-color: var(--success-color); background: rgba(34, 197, 94, 0.1); }
 .checkmark:after { content: ""; position: absolute; display: none; left: 7px; top: 2px; width: 4px; height: 10px; border: solid var(--success-color); border-width: 0 3px 3px 0; transform: rotate(45deg); }
 .custom-checkbox input:checked ~ .checkmark:after { display: block; }
 
-/* Forms & Stepper */
-.param-group { margin-bottom: 1rem; }
+/* Form Elements */
+.param-group { margin-bottom: 1rem; flex-shrink: 0; }
 .param-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; }
 .stepper { display: flex; background: #0f172a; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; }
 .stepper button { width: 34px; height: 34px; background: #1e293b; border: none; color: white; cursor: pointer; }
 .stepper input { flex-grow: 1; background: transparent; border: none; color: white; text-align: center; font-weight: 700; width: 40px; }
 
-.calc-result { background: #0f172a; padding: 0.75rem; border-radius: 10px; border-left: 4px solid var(--primary-color); text-align: center; margin-top: 0.75rem; }
+.calc-result { background: #0f172a; padding: 0.75rem; border-radius: 10px; border-left: 4px solid var(--primary-color); text-align: center; margin-top: 0.75rem; flex-shrink: 0; }
 .calc-result small { display: block; font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); }
 .calc-result div { font-size: 1.2rem; font-weight: 800; }
-.btn-block { width: 100%; padding: 0.7rem; background: var(--success-color); border: none; color: white; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 1rem; }
+.btn-block { width: 100%; padding: 0.7rem; background: var(--success-color); border: none; color: white; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 1rem; flex-shrink: 0; }
 
 /* Modals */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); display: flex; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(8px); }
@@ -172,13 +218,14 @@ header {
 .modal-actions button { flex: 1; padding: 0.8rem; border-radius: 10px; cursor: pointer; background: #0f172a; border: 1px solid var(--border-color); color: white; }
 .modal-actions button.btn-primary { background: var(--primary-color); border: none; }
 
-/* Admin */
+/* Admin actions */
 #add-member-btn { background: var(--primary-color); border: none; color: white; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; }
 .remove-member-btn { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #f87171; padding: 2px 6px; border-radius: 5px; font-size: 0.65rem; cursor: pointer; }
 
 /* Responsive fallback */
 @media (max-width: 1200px) {
-    body { overflow-y: auto; height: auto; }
-    .app-container { flex-direction: column; height: auto; }
-    .sidebar, .right-sidebar { width: 100%; }
+    body, html { overflow-y: auto; height: auto; }
+    #app-main-layout, .app-container { height: auto; overflow: visible; display: block; }
+    .sidebar, .content, .right-sidebar { width: 100%; height: auto; margin-bottom: 1.5rem; }
+    #members-payment-list, .calendar-grid { overflow-y: visible; height: auto; }
 }
