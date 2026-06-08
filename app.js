@@ -297,7 +297,6 @@ function renderPayments() {
         div.className = `payment-item ${isPaid ? 'paid' : ''}`;
         let metaHtml = (isPaid && typeof paidBy === 'string' && paidBy !== 'true') ? `<small class="paid-meta">Přijal(a): ${getDisplayName(paidBy)}</small>` : '';
         div.innerHTML = `<div class="payment-info"><span class="member-name">${member}</span>${metaHtml}</div><div style="display: flex; align-items: center;"><label class="custom-checkbox"><input type="checkbox" ${isPaid ? 'checked' : ''}><span class="checkmark"></span></label></div>`;
-        div.onclick = (e) => { if (e.target.tagName !== 'INPUT' && !e.target.classList.contains('checkmark')) togglePayment(member, !isPaid); };
         const checkbox = div.querySelector('input');
         checkbox.onchange = (e) => togglePayment(member, e.target.checked);
         listEl.appendChild(div);
