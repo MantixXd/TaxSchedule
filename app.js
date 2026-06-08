@@ -474,7 +474,16 @@ function renderDay(dayNumber, classes) {
         userDiv.style.background = getUserColor(username);
         div.appendChild(userDiv);
     }
-    if (isMainMonth) div.onclick = () => toggleCommitment(dateStr);
+    if (isMainMonth) {
+        const isPastDay = classes.includes('past-day');
+        div.onclick = () => {
+            if (isPastDay) {
+                showModal("Informace", "Na uplynulé dny se již nelze přihlašovat.", null, true);
+            } else {
+                toggleCommitment(dateStr);
+            }
+        };
+    }
     grid.appendChild(div);
 }
 

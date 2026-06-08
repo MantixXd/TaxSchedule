@@ -172,6 +172,8 @@ header {
 .calendar-day:hover:not(.header-day):not(.other-month) { background: rgba(51, 65, 85, 0.9); border-color: var(--primary-color); }
 .calendar-day.today { border-color: var(--primary-color); background: rgba(59, 130, 246, 0.2); }
 .calendar-day.header-day { min-height: auto; border: none; background: transparent; font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; text-align: center; }
+.calendar-day.past-day { opacity: 0.6; cursor: not-allowed; }
+.calendar-day.past-day:hover { background: rgba(30, 41, 59, 0.7); border-color: rgba(148, 163, 184, 0.25); }
 .calendar-day.other-month { opacity: 0.3; background: rgba(15, 23, 42, 0.3); border-color: var(--border-color); cursor: default; }
 .day-number { font-weight: 700; font-size: 0.8rem; color: var(--text-muted); }
 .day-user { padding: 3px 6px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; text-align: center; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -199,8 +201,9 @@ header {
     border-radius: 10px;
 }
 .payment-item.paid { background: rgba(34, 197, 94, 0.05); border-color: rgba(34, 197, 94, 0.2); }
+.payment-info { display: flex; flex-direction: column; gap: 4px; justify-content: center; }
 .member-name { font-weight: 600; font-size: 0.85rem; }
-.paid-meta { font-size: 0.6rem; color: var(--text-muted); font-style: italic; }
+.paid-meta { font-size: 0.65rem; color: var(--text-muted); font-style: italic; }
 
 /* Checkbox */
 .custom-checkbox { position: relative; width: 22px; height: 22px; cursor: pointer; flex-shrink: 0; }
