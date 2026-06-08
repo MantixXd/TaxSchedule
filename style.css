@@ -109,9 +109,9 @@ header {
     min-height: 0;
 }
 
-.sidebar { width: 280px; flex-shrink: 0; }
+.sidebar { width: 210px; flex-shrink: 0; }
 .content { min-width: 0; }
-.right-sidebar { width: 340px; }
+.right-sidebar { width: 260px; }
 
 /* Cards */
 .card {
