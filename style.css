@@ -80,12 +80,11 @@ header {
 
 /* Dashboard Core Layout - DEFINITIVE HEIGHT LOCK */
 #app-main-layout {
-    flex: 1;
+    flex: 1 1 0%;
     display: flex;
     flex-direction: column;
-    height: 0; /* Forces flex child to stay within allocated space */
-    min-height: 0;
     overflow: hidden;
+    min-height: 0;
 }
 
 .app-container {
@@ -95,23 +94,23 @@ header {
     padding: 1.5rem;
     display: flex;
     gap: 1.5rem;
-    flex: 1;
-    height: 0; /* Forces container to stay within viewport */
-    min-height: 0;
+    flex: 1 1 0%;
     align-items: stretch;
     overflow: hidden;
+    min-height: 0;
 }
 
 /* Columns */
 .sidebar, .content {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    flex: 1 1 0%;
+    overflow: hidden;
     min-height: 0;
 }
 
 .sidebar { width: 280px; flex-shrink: 0; }
-.content { flex-grow: 1; min-width: 0; }
+.content { min-width: 0; }
 .right-sidebar { width: 340px; }
 
 /* Cards */
@@ -122,8 +121,10 @@ header {
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    min-height: 0;
+    flex: 1 1 0%;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    min-height: 0;
 }
 
 .content .card, .right-sidebar .card {

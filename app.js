@@ -122,7 +122,7 @@ function checkAuthState() {
         currentUsername = savedUser;
         updateActivity();
         if (loginOverlay) loginOverlay.style.display = 'none';
-        if (appLayout) appLayout.style.display = 'block';
+        if (appLayout) appLayout.style.display = 'flex';
         if (userDisplay) userDisplay.textContent = `Uživatel: ${getDisplayName(currentUsername)}`;
         initApp().catch(e => console.error("Init pád:", e));
     } else {
