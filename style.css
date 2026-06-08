@@ -117,8 +117,8 @@ header {
     min-height: 0;
 }
 
-.left-sidebar { width: 200px; flex: 0 0 200px; }
-.right-sidebar { width: 260px; flex: 0 0 260px; }
+.left-sidebar { width: 220px; flex: 0 0 220px; }
+.right-sidebar { width: 280px; flex: 0 0 280px; }
 
 /* Cards */
 .card {
